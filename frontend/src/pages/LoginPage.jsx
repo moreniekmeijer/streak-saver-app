@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 
@@ -37,12 +37,12 @@ function LoginPage() {
       <h2>Inloggen</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label>Email</label>
+          <label>Username</label>
           <input
-            {...register("email", { required: "Email is verplicht" })}
-            type="email"
+            {...register("username", { required: "Username is verplicht" })}
+            type="text"
           />
-          {errors.email && <p>{errors.email.message}</p>}
+          {errors.username && <p>{errors.username.message}</p>}
         </div>
 
         <div>
@@ -57,6 +57,9 @@ function LoginPage() {
         {loginError && <p style={{ color: "red" }}>{loginError}</p>}
 
         <button type="submit">Login</button>
+
+        <p>Nieuw? Registreer je <NavLink to="/register">hier</NavLink></p>
+
       </form>
     </div>
   );
