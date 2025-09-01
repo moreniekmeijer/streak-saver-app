@@ -1,7 +1,8 @@
+from datetime import date
 import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, create_access_token
+from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
 
 from models import db, bcrypt, User, Streak
 
@@ -19,6 +20,7 @@ db.init_app(app)
 bcrypt.init_app(app)
 
 
+# User logic
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -35,6 +37,11 @@ def register():
     hashed_pw = bcrypt.generate_password_hash(password).decode("utf-8")
     new_user = User(username=username, password_hash=hashed_pw)
     db.session.add(new_user)
+    db.session.flush()
+
+    streak = Streak(date=date.today(), current_streak=0)
+    new_user.streak.append(streak)
+
     db.session.commit()
 
     return jsonify({"message": "User created successfully"}), 201
@@ -50,8 +57,88 @@ def login():
     if not user or not bcrypt.check_password_hash(user.password_hash, password):
         return jsonify({"error": "Invalid username or password"}), 401
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
     return jsonify({"token": access_token, "user": user.to_dict()}), 200
+
+
+# Streak logic
+def handle_missed_days(streak):
+    if not streak.last_action_date:
+        return
+    
+    last = streak.last_action_date
+    today = date.today()
+    diff = (today - last).days
+    if diff <= 1:
+        return
+    
+    missed = diff - 1
+    if streak.freezes >= missed:
+        streak.freezes -= missed
+    else:
+        streak.current_streak = 0
+        streak.freezes = 1
+        streak.last_action_date = None
+
+
+@app.route("/streak/get", methods=["GET"])
+@jwt_required()
+def get_streak():
+    user_id = int(get_jwt_identity())
+    streak = Streak.query.filter_by(user_id=user_id).first()
+
+    return jsonify({
+        "current_streak": streak.current_streak,
+        "freezes": streak.freezes,
+        "last_action_date": streak.last_action_date,
+        "difficulty": streak.difficulty
+    })
+
+
+@app.route("/streak/add", methods=["POST"])
+@jwt_required()
+def add_streak():
+    user_id = int(get_jwt_identity())
+    streak = Streak.query.filter_by(user_id=user_id).first()
+    if not streak:
+        return jsonify({"msg": "No streak data"}), 404
+
+    handle_missed_days(streak)
+
+    today = date.today()
+    last = streak.last_action_date
+    if last == today:
+        return jsonify({"msg": "Already done today"}), 400
+    
+    streak.current_streak += 1
+    streak.last_action_date = today
+
+    db.session.commit()
+    return jsonify({
+        "current_streak": streak.current_streak,
+        "freezes": streak.freezes,
+        "last_action_date": streak.last_action_date.isoformat()
+    }), 200
+
+
+@app.route("/streak/reset", methods=["POST"])
+@jwt_required()
+def reset_streak():
+    user_id = int(get_jwt_identity())
+    streak = Streak.query.filter_by(user_id=user_id).first()
+    if not streak:
+        return jsonify({"msg": "No streak data"}), 404
+
+    streak.current_streak = 0
+    streak.freezes = 1
+    streak.last_action_date = date.today()
+
+    db.session.commit()
+    return jsonify({
+        "current_streak": streak.current_streak,
+        "freezes": streak.freezes,
+        "last_action_date": streak.last_action_date.isoformat()
+    }), 200
 
 
 if __name__ == "__main__":

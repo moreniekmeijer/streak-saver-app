@@ -23,13 +23,18 @@ class User (db.Model):
 class Streak(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    count = db.Column(db.Integer, default=0)
+    date = db.Column(db.Date, default=db.func.current_date())
+    last_action_date = db.Column(db.Date)
+    current_streak = db.Column(db.Integer, default=0)
+    freezes = db.Column(db.Integer, default=0)
+    difficulty = db.Column(db.Integer, default=1)
 
     def to_dict(self):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'date': self.date.isoformat(),
-            'count': self.count
+            'date': self.date.isoformat() if self.date else None,
+            'last_action_date': self.last_action_date.isoformat() if self.last_action_date else None,
+            'current_streak': self.current_streak,
+            'freezes': self.freezes
         }

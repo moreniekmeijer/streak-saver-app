@@ -11,7 +11,16 @@
 }
 
 header {
-  padding-top: 4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 4rem; /* vertical padding, horizontal padding */
+  z-index: 100;
+}
+
+.logout-button {
+  background: transparent;
+  color: #007bff;
 }
 
 section {
