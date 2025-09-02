@@ -92,18 +92,16 @@ def handle_missed_days(streak):
         streak.last_action_date = None
 
 
-@app.route("/streak/get", methods=["GET"])
+@app.route("/streak", methods=["GET"])
 @jwt_required()
 def get_streak():
     user_id = int(get_jwt_identity())
     streak = Streak.query.filter_by(user_id=user_id).first()
 
-    return jsonify({
-        "current_streak": streak.current_streak,
-        "freezes": streak.freezes,
-        "last_action_date": streak.last_action_date,
-        "difficulty": streak.difficulty
-    })
+    if not streak:
+        return jsonify({"error": "No streak found"}), 404
+
+    return jsonify(streak.to_dict())
 
 
 @app.route("/streak/add", methods=["POST"])
@@ -112,14 +110,14 @@ def add_streak():
     user_id = int(get_jwt_identity())
     streak = Streak.query.filter_by(user_id=user_id).first()
     if not streak:
-        return jsonify({"msg": "No streak data"}), 404
+        return jsonify({"error": "No streak data"}), 404
 
     handle_missed_days(streak)
 
     today = date.today()
     last = streak.last_action_date
     if last == today:
-        return jsonify({"msg": "Already done today"}), 400
+        return jsonify({"error": "Already done today"}), 400
     
     streak.current_streak += 1
     streak.last_action_date = today
@@ -128,11 +126,7 @@ def add_streak():
         streak.freezes += generate_freezes(streak.difficulty)
 
     db.session.commit()
-    return jsonify({
-        "current_streak": streak.current_streak,
-        "freezes": streak.freezes,
-        "last_action_date": streak.last_action_date.isoformat()
-    }), 200
+    return jsonify(streak.to_dict())
 
 
 @app.route("/streak/reset", methods=["POST"])
@@ -141,18 +135,14 @@ def reset_streak():
     user_id = int(get_jwt_identity())
     streak = Streak.query.filter_by(user_id=user_id).first()
     if not streak:
-        return jsonify({"msg": "No streak data"}), 404
+        return jsonify({"error": "No streak data"}), 404
 
     streak.current_streak = 0
     streak.freezes = 1
     streak.last_action_date = date.today()
 
     db.session.commit()
-    return jsonify({
-        "current_streak": streak.current_streak,
-        "freezes": streak.freezes,
-        "last_action_date": streak.last_action_date.isoformat()
-    }), 200
+    return jsonify(streak.to_dict())
 
 
 @app.route("/streak/update_difficulty", methods=["PUT"])
@@ -172,10 +162,7 @@ def update_difficulty():
     streak.difficulty = new_difficulty
     db.session.commit()
 
-    return jsonify({
-        "message": "Difficulty updated successfully",
-        "difficulty": streak.difficulty
-    }), 200
+    return jsonify(streak.to_dict())
 
 
 if __name__ == "__main__":

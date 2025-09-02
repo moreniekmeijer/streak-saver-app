@@ -26,8 +26,8 @@ class Streak(db.Model):
     date = db.Column(db.Date, default=db.func.current_date())
     last_action_date = db.Column(db.Date)
     current_streak = db.Column(db.Integer, default=0)
-    freezes = db.Column(db.Integer, default=0)
-    difficulty = db.Column(db.Integer, default=1)
+    freezes = db.Column(db.Integer, default=1)
+    difficulty = db.Column(db.Integer, default="medium")
 
     def to_dict(self):
         return {
@@ -36,5 +36,6 @@ class Streak(db.Model):
             'date': self.date.isoformat() if self.date else None,
             'last_action_date': self.last_action_date.isoformat() if self.last_action_date else None,
             'current_streak': self.current_streak,
-            'freezes': self.freezes
+            'freezes': self.freezes,
+            'difficulty': self.difficulty
         }

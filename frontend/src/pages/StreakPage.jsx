@@ -1,26 +1,36 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 
 function StreakPage() {
-  const [streak, setStreak] = useState(0);
-  const [freezes, setFreezes] = useState(0);
-  const { token, logout } = useContext(AuthContext);
+  const [streakData, setStreakData] = useState(null);
+  const { token } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchStreak = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/streak`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setStreakData(response.data);
+      } catch (err) {
+        console.error("Error fetching streak:", err);
+      }
+    };
+    fetchStreak();
+  }, [token]);
 
   const addStreak = async () => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/streak/add`,
         null,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setStreak(response.data.current_streak);
-      setFreezes(response.data.freezes);
+      setStreakData(response.data);
     } catch (err) {
       console.error("Error adding streak:", err);
     }
@@ -31,15 +41,9 @@ function StreakPage() {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/streak/reset`,
         null,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setStreak(response.data.current_streak);
-      setFreezes(response.data.freezes);
+      setStreakData(response.data);
     } catch (err) {
       console.error("Error resetting streak:", err);
     }
@@ -51,22 +55,22 @@ function StreakPage() {
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/streak/update_difficulty`,
         { difficulty: newDifficulty },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("Difficulty updated:", response.data);
+      setStreakData((prev) => ({
+        ...prev,
+        difficulty: response.data.difficulty,
+      }));
     } catch (err) {
       console.error("Error updating difficulty:", err);
     }
   };
 
+  if (!streakData) return <p>Loading...</p>;
+
   return (
     <main>
-      <section class="task-done">
+      <section className="task-done">
         <p>
           Doing a task every day? Pin this page and click the green button daily
           to keep track of your progress! (If you forget to do the task, it will
@@ -75,14 +79,13 @@ function StreakPage() {
         <button type="button" onClick={addStreak}>
           Done!
         </button>
-        <div id="task-done-text"></div>
-        <div id="new-freezes"></div>
-        <div class="amounts">
-          <p id="streak-amount">Streak amount: {streak}</p>
-          <p id="freeze-amount">Freeze amount: {freezes}</p>
+        <div className="amounts">
+          <p>Streak amount: {streakData.current_streak}</p>
+          <p>Freeze amount: {streakData.freezes}</p>
+          <p>Difficulty: {streakData.difficulty}</p>
         </div>
       </section>
-      <section class="options">
+      <section className="options">
         <p>
           Be careful, use this button only if you want to restart another task.
           It will reset your streak and freezes!
@@ -90,11 +93,14 @@ function StreakPage() {
         <button type="button" onClick={resetStreak}>
           Reset
         </button>
-        <div id="reset-text"></div>
-        <label for="difficulty">
+        <label htmlFor="difficulty">
           Choose difficulty (how commited are you?):
         </label>
-        <select id="difficulty" onChange={updateDifficulty}>
+        <select
+          id="difficulty"
+          value={streakData.difficulty}
+          onChange={updateDifficulty}
+        >
           <option value="easy">Not so...</option>
           <option value="medium">Decently</option>
           <option value="hard">Very!</option>
