@@ -5,7 +5,11 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 
 function LoginPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState("");
@@ -21,12 +25,12 @@ function LoginPage() {
     } catch (error) {
       if (error.response) {
         if (error.response.status === 401) {
-          setLoginError("Ongeldige gebruikersnaam of wachtwoord.");
+          setLoginError("Invalid username or password.");
         } else {
-          setLoginError("Er is iets misgegaan. Probeer het later opnieuw.");
+          setLoginError("Something went wrong. Try again later.");
         }
       } else {
-        setLoginError("Server niet bereikbaar.");
+        setLoginError("Server not available.");
       }
       console.error(error);
     }
@@ -34,21 +38,21 @@ function LoginPage() {
 
   return (
     <div>
-      <h2>Inloggen</h2>
+      <h2>Log in</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
           <label>Username</label>
           <input
-            {...register("username", { required: "Username is verplicht" })}
+            {...register("username", { required: "Username is required" })}
             type="text"
           />
           {errors.username && <p>{errors.username.message}</p>}
         </div>
 
         <div>
-          <label>Wachtwoord</label>
+          <label>Password</label>
           <input
-            {...register("password", { required: "Wachtwoord is verplicht" })}
+            {...register("password", { required: "password is required" })}
             type="password"
           />
           {errors.password && <p>{errors.password.message}</p>}
@@ -58,8 +62,9 @@ function LoginPage() {
 
         <button type="submit">Login</button>
 
-        <p>Nieuw? Registreer je <NavLink to="/register">hier</NavLink></p>
-
+        <p>
+          New? Register <NavLink to="/register">here</NavLink>
+        </p>
       </form>
     </div>
   );

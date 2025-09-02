@@ -1,5 +1,6 @@
 from datetime import date
 import os
+from random import random
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
@@ -20,12 +21,22 @@ db.init_app(app)
 bcrypt.init_app(app)
 
 
+def generate_freezes(difficulty):
+    lookup = {
+        "easy": [1, 2, 3],
+        "medium": [0, 1, 2],
+        "hard": [0, 1]
+    }
+    return random.choice(lookup.get(difficulty, lookup["easy"]))
+
+
 # User logic
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
+    difficulty = data.get("difficulty")
 
     if not username or not password:
         return jsonify({"error": "Username and password required"}), 400
@@ -39,7 +50,7 @@ def register():
     db.session.add(new_user)
     db.session.flush()
 
-    streak = Streak(date=date.today(), current_streak=0)
+    streak = Streak(date=date.today(), difficulty=difficulty, current_streak=0)
     new_user.streak.append(streak)
 
     db.session.commit()
@@ -113,6 +124,9 @@ def add_streak():
     streak.current_streak += 1
     streak.last_action_date = today
 
+    if streak.current_streak % 5 == 0 and streak.freezes < 3:
+        streak.freezes += generate_freezes(streak.difficulty)
+
     db.session.commit()
     return jsonify({
         "current_streak": streak.current_streak,
@@ -138,6 +152,29 @@ def reset_streak():
         "current_streak": streak.current_streak,
         "freezes": streak.freezes,
         "last_action_date": streak.last_action_date.isoformat()
+    }), 200
+
+
+@app.route("/streak/update_difficulty", methods=["PUT"])
+@jwt_required()
+def update_difficulty():
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    new_difficulty = data.get("difficulty")
+
+    if new_difficulty not in ["easy", "medium", "hard"]:
+        return jsonify({"error": "Invalid difficulty"}), 400
+
+    streak = Streak.query.filter_by(user_id=user_id).first()
+    if not streak:
+        return jsonify({"error": "No streak found"}), 404
+
+    streak.difficulty = new_difficulty
+    db.session.commit()
+
+    return jsonify({
+        "message": "Difficulty updated successfully",
+        "difficulty": streak.difficulty
     }), 200
 
 

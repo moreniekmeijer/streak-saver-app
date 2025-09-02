@@ -45,6 +45,25 @@ function StreakPage() {
     }
   };
 
+  const updateDifficulty = async (e) => {
+    const newDifficulty = e.target.value;
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/streak/update_difficulty`,
+        { difficulty: newDifficulty },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Difficulty updated:", response.data);
+    } catch (err) {
+      console.error("Error updating difficulty:", err);
+    }
+  };
+
   return (
     <main>
       <section class="task-done">
@@ -75,7 +94,7 @@ function StreakPage() {
         <label for="difficulty">
           Choose difficulty (how commited are you?):
         </label>
-        <select id="difficulty" onChange="updateDifficulty()">
+        <select id="difficulty" onChange={updateDifficulty}>
           <option value="easy">Not so...</option>
           <option value="medium">Decently</option>
           <option value="hard">Very!</option>
