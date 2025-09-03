@@ -1,4 +1,6 @@
-flask
-flask_sqlalchemy
-flask_bcrypt
-flask_jwt_extended
+Flask
+Flask-SQLAlchemy
+Flask-Bcrypt
+Flask-JWT-Extended
+Flask-Cors
+gunicorn
