@@ -4,13 +4,13 @@ import random
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
-
+from flask_migrate import Migrate
 from models import db, bcrypt, User, Streak
 
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///site.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'mysecretkey')
@@ -18,6 +18,7 @@ jwt = JWTManager(app)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 db.init_app(app)
+migrate = Migrate(app, db)
 bcrypt.init_app(app)
 
 
