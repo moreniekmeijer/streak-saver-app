@@ -27,7 +27,7 @@ class Streak(db.Model):
     last_action_date = db.Column(db.Date)
     current_streak = db.Column(db.Integer, default=0)
     freezes = db.Column(db.Integer, default=1)
-    difficulty = db.Column(db.Integer, default="medium")
+    difficulty = db.Column(db.String(20), default="medium")
 
     def to_dict(self):
         return {
