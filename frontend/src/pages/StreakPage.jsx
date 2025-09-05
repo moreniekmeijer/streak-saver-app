@@ -69,8 +69,8 @@ function StreakPage() {
   if (!streakData) return <p>Loading...</p>;
 
   return (
-    <main>
-      <section className="task-done">
+    <>
+      <section className="taskDone">
         <p>
           Doing a task every day? Pin this page and click the green button daily
           to keep track of your progress! (If you forget to do the task, it will
@@ -79,7 +79,7 @@ function StreakPage() {
         <button type="button" onClick={addStreak}>
           Done!
         </button>
-        <div className="amounts">
+        <div className="streakData">
           <p>Streak amount: {streakData.current_streak}</p>
           <p>Freeze amount: {streakData.freezes}</p>
           <p>Difficulty: {streakData.difficulty}</p>
@@ -106,7 +106,7 @@ function StreakPage() {
           <option value="hard">Very!</option>
         </select>
       </section>
-    </main>
+    </>
   );
 }
 

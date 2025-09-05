@@ -12,14 +12,7 @@ const Header = () => {
   };
 
   return (
-    <header className="app-header">
-      <h1>Streak Saver</h1>
-      {token && (
-        <button onClick={handleLogout} className="logout-button">
-          Logout
-        </button>
-      )}
-    </header>
+    <footer>{token && <button onClick={handleLogout}>Logout</button>}</footer>
   );
 };
 

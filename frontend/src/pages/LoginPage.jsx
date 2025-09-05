@@ -37,7 +37,7 @@ function LoginPage() {
   };
 
   return (
-    <div>
+    <>
       <h2>Log in</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
@@ -66,7 +66,7 @@ function LoginPage() {
           New? Register <NavLink to="/register">here</NavLink>
         </p>
       </form>
-    </div>
+    </>
   );
 }
 

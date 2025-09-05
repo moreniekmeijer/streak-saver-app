@@ -4,23 +4,20 @@
   box-sizing: border-box;
   margin: 0 auto;
   padding: 0;
-  font-family: "Roboto Light", sans-serif;
+}
+
+body {
   background: #e9f0ff;
+  font-family: "Roboto Light", sans-serif;
   line-height: 1.5;
   text-align: center;
 }
 
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem 4rem; /* vertical padding, horizontal padding */
-  z-index: 100;
-}
-
-.logout-button {
-  background: transparent;
-  color: #007bff;
+  padding: 1.4rem;
+  margin-bottom: 1.8rem;
+  background-color: #004494;
+  color: #e9f0ff;
 }
 
 section {
@@ -33,13 +30,13 @@ section {
   gap: 1rem;
 }
 
-.amounts {
+.streakData {
   padding: 0 2rem;
   border: black solid 2px;
   border-radius: 10px;
 }
 
-.task-done button {
+.taskDone button {
   background: #00800b;
   width: 8rem;
   height: 8rem;
@@ -51,7 +48,7 @@ section {
   text-transform: uppercase;
 }
 
-.task-done button:active {
+.taskDone button:active {
   background: #1cbc25;
 }
 
@@ -84,13 +81,12 @@ form {
 }
 
 label {
-  text-align: left;
   font-size: 0.9rem;
-  color: #444;
+  padding-right: 0.4rem;
 }
 
 input {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
@@ -123,8 +119,26 @@ button:active {
   background: #004494;
 }
 
-form .error {
+.error {
+  padding-left: 1rem;
   color: #d9534f;
-  font-size: 0.85rem;
-  text-align: left;
+}
+
+.note {
+  font-size: 0.9rem;
+}
+
+footer button {
+  background: transparent;
+  color: #007bff;
+}
+
+footer button:hover {
+  background: transparent;
+  color: #0056b3;
+}
+
+footer button:active {
+  background: transparent;
+  color: #004494;
 }

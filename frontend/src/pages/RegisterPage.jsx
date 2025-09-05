@@ -27,7 +27,7 @@ function RegisterPage() {
   };
 
   return (
-    <div>
+    <>
       <h2>Register</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
@@ -36,7 +36,9 @@ function RegisterPage() {
             {...register("username", { required: "Username is required" })}
             type="text"
           />
-          {errors.username && <p>{errors.username.message}</p>}
+          {errors.username && (
+            <p className="error">{errors.username.message}</p>
+          )}
         </div>
 
         <div>
@@ -45,29 +47,33 @@ function RegisterPage() {
             {...register("password", { required: "Password is required" })}
             type="password"
           />
-          {errors.password && <p>{errors.password.message}</p>}
+          {errors.password && (
+            <p className="error">{errors.password.message}</p>
+          )}
         </div>
 
         <div>
-          <label>Difficulty</label>
+          <label>Commitment</label>
           <select
             {...register("difficulty", { required: "Difficulty is required" })}
             defaultValue="medium"
           >
-            <option value="easy">Not so...</option>
-            <option value="medium">Decently</option>
-            <option value="hard">Very!</option>
+            <option value="easy">Low</option>
+            <option value="medium">Decent</option>
+            <option value="hard">High</option>
           </select>
-          {errors.difficulty && <p>{errors.difficulty.message}</p>}
+          {errors.difficulty && (
+            <p className="error">{errors.difficulty.message}</p>
+          )}
         </div>
 
-        <p>Difficulty can be changed later on as well.</p>
+        <p className="note">Difficulty can be changed later on as well.</p>
 
-        {registerError && <p style={{ color: "red" }}>{registerError}</p>}
+        {registerError && <p className="error">{registerError}</p>}
 
         <button type="submit">Register</button>
       </form>
-    </div>
+    </>
   );
 }
 
