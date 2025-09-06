@@ -4,7 +4,16 @@ import { AuthContext } from "../context/AuthContext";
 
 function StreakPage() {
   const [streakData, setStreakData] = useState(null);
+  const [error, setError] = useState(null);
   const { token } = useContext(AuthContext);
+  const alreadyDoneToday = streakData.last_action_date === today;
+
+  const showError = (message) => {
+    setError(message);
+    setTimeout(() => {
+      setError(null);
+    }, 3000);
+  };
 
   useEffect(() => {
     const fetchStreak = async () => {
@@ -18,6 +27,7 @@ function StreakPage() {
         setStreakData(response.data);
       } catch (err) {
         console.error("Error fetching streak:", err);
+        setError("Could not load streak data");
       }
     };
     fetchStreak();
@@ -33,6 +43,7 @@ function StreakPage() {
       setStreakData(response.data);
     } catch (err) {
       console.error("Error adding streak:", err);
+      showError(err.response?.data?.error || "Could not add streak.");
     }
   };
 
@@ -46,6 +57,7 @@ function StreakPage() {
       setStreakData(response.data);
     } catch (err) {
       console.error("Error resetting streak:", err);
+      showError("Could not reset streak");
     }
   };
 
@@ -63,6 +75,7 @@ function StreakPage() {
       }));
     } catch (err) {
       console.error("Error updating difficulty:", err);
+      showError("Could not update difficulty");
     }
   };
 
@@ -76,9 +89,10 @@ function StreakPage() {
           to keep track of your progress! (If you forget to do the task, it will
           use up a freeze if available...)
         </p>
-        <button type="button" onClick={addStreak}>
-          Done!
+        <button type="button" onClick={addStreak} disabled={alreadyDoneToday}>
+          {alreadyDoneToday ? "Already done today ✅" : "Done!"}
         </button>
+        {error && <p className="error">{error}</p>}
         <div className="streakData">
           <p>Streak amount: {streakData.current_streak}</p>
           <p>Freeze amount: {streakData.freezes}</p>

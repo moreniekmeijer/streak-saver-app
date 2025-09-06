@@ -140,7 +140,8 @@ def reset_streak():
 
     streak.current_streak = 0
     streak.freezes = 1
-    streak.last_action_date = date.today()
+    streak.start_date = date.today()
+    streak.last_action_date = None
 
     db.session.commit()
     return jsonify(streak.to_dict())
