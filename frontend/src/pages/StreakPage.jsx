@@ -4,15 +4,15 @@ import { AuthContext } from "../context/AuthContext";
 
 function StreakPage() {
   const [streakData, setStreakData] = useState(null);
-  const [error, setError] = useState(null);
   const { token, user } = useContext(AuthContext);
   const today = new Date().toISOString().split("T")[0];
   const alreadyDoneToday = streakData?.last_action_date === today;
+  const [message, setMessage] = useState(null);
 
-  const showError = (message) => {
-    setError(message);
+  const showMessage = (text, type = "error") => {
+    setMessage({ text, type });
     setTimeout(() => {
-      setError(null);
+      setMessage(null);
     }, 3000);
   };
 
@@ -47,9 +47,10 @@ function StreakPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setStreakData(response.data);
+      showMessage("Good job!", "success");
     } catch (err) {
       console.error("Error adding streak:", err);
-      showError(err.response?.data?.error || "Could not add streak.");
+      showMessage(err.response?.data?.error || "Could not add streak.");
     }
   };
 
@@ -63,7 +64,7 @@ function StreakPage() {
       setStreakData(response.data);
     } catch (err) {
       console.error("Error resetting streak:", err);
-      showError("Could not reset streak");
+      showMessage("Could not reset streak");
     }
   };
 
@@ -81,7 +82,7 @@ function StreakPage() {
       }));
     } catch (err) {
       console.error("Error updating difficulty:", err);
-      showError("Could not update difficulty");
+      showMessage("Could not update difficulty");
     }
   };
 
@@ -90,7 +91,7 @@ function StreakPage() {
   return (
     <>
       <section className="taskDone">
-        {user && <h3>Hello, {user?.username}!</h3>}
+        {user && <h3>Hello {user?.username}!</h3>}
         <p>
           Doing a task every day? Pin this page and click the green button daily
           to keep track of your progress! (If you forget to do the task, it will
@@ -99,13 +100,15 @@ function StreakPage() {
         <button type="button" disabled={alreadyDoneToday} onClick={addStreak}>
           {alreadyDoneToday ? "Already done today" : "Done!"}
         </button>
-        {error && <p className="error">{error}</p>}
+        {message && <p className={message.type}>{message.text}</p>}
+
         <div className="streakData">
           <p>Streak amount: {streakData.current_streak}</p>
           <p>Freeze amount: {streakData.freezes}</p>
           <p>Difficulty: {streakData.difficulty}</p>
         </div>
       </section>
+
       <section className="options">
         <p>
           Be careful, use this button only if you want to restart another task.
@@ -114,6 +117,7 @@ function StreakPage() {
         <button type="button" onClick={resetStreak}>
           Reset
         </button>
+
         <label htmlFor="difficulty">
           Choose difficulty (how commited are you?):
         </label>
