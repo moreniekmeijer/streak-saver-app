@@ -6,7 +6,8 @@ function StreakPage() {
   const [streakData, setStreakData] = useState(null);
   const [error, setError] = useState(null);
   const { token } = useContext(AuthContext);
-  const alreadyDoneToday = streakData.last_action_date === today;
+  const today = new Date().toISOString().split("T")[0];
+  const alreadyDoneToday = streakData?.last_action_date === today;
 
   const showError = (message) => {
     setError(message);
@@ -26,8 +27,13 @@ function StreakPage() {
         );
         setStreakData(response.data);
       } catch (err) {
-        console.error("Error fetching streak:", err);
-        setError("Could not load streak data");
+        if (err.response && err.response.status === 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/login";
+        } else {
+          console.error("Error fetching streak:", err);
+          setError("Could not load streak data");
+        }
       }
     };
     fetchStreak();
@@ -89,8 +95,8 @@ function StreakPage() {
           to keep track of your progress! (If you forget to do the task, it will
           use up a freeze if available...)
         </p>
-        <button type="button" onClick={addStreak} disabled={alreadyDoneToday}>
-          {alreadyDoneToday ? "Already done today ✅" : "Done!"}
+        <button type="button" disabled={alreadyDoneToday} onClick={addStreak}>
+          {alreadyDoneToday ? "Already done today" : "Done!"}
         </button>
         {error && <p className="error">{error}</p>}
         <div className="streakData">
