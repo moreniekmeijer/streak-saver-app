@@ -20,7 +20,7 @@ function LoginPage() {
         `${import.meta.env.VITE_API_URL}/login`,
         data
       );
-      login(response.data.token);
+      login(response.data.token, response.data.user);
       navigate("/");
     } catch (error) {
       if (error.response) {

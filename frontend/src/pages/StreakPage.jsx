@@ -5,7 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 function StreakPage() {
   const [streakData, setStreakData] = useState(null);
   const [error, setError] = useState(null);
-  const { token } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
   const today = new Date().toISOString().split("T")[0];
   const alreadyDoneToday = streakData?.last_action_date === today;
 
@@ -90,6 +90,7 @@ function StreakPage() {
   return (
     <>
       <section className="taskDone">
+        {user && <h3>Hello, {user?.username}!</h3>}
         <p>
           Doing a task every day? Pin this page and click the green button daily
           to keep track of your progress! (If you forget to do the task, it will
