@@ -28,8 +28,7 @@ function StreakPage() {
         setStreakData(response.data);
       } catch (err) {
         if (err.response && err.response.status === 401) {
-          localStorage.removeItem("token");
-          window.location.href = "/login";
+          logout();
         } else {
           console.error("Error fetching streak:", err);
           setError("Could not load streak data");
