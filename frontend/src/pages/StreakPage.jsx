@@ -13,7 +13,7 @@ function StreakPage() {
     setMessage({ text, type });
     setTimeout(() => {
       setMessage(null);
-    }, 5000);
+    }, 6000);
   };
 
   useEffect(() => {
