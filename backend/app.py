@@ -76,21 +76,25 @@ def login():
 # Streak logic
 def handle_missed_days(streak):
     if not streak.last_action_date:
-        return
+        return 0
     
     last = streak.last_action_date
     today = date.today()
     diff = (today - last).days
     if diff <= 1:
-        return
+        return 0
     
     missed = diff - 1
+    used = 0
     if streak.freezes >= missed:
         streak.freezes -= missed
+        used = missed
     else:
+        used = streak.freezes
         streak.current_streak = 0
         streak.freezes = 1
         streak.last_action_date = None
+    return used
 
 
 @app.route("/streak", methods=["GET"])
@@ -113,7 +117,8 @@ def add_streak():
     if not streak:
         return jsonify({"error": "No streak data"}), 404
 
-    handle_missed_days(streak)
+    used_freezes = handle_missed_days(streak)
+    earned_freezes = 0
 
     today = date.today()
     last = streak.last_action_date
@@ -124,10 +129,17 @@ def add_streak():
     streak.last_action_date = today
 
     if streak.current_streak % 5 == 0 and streak.freezes < 3:
-        streak.freezes += generate_freezes(streak.difficulty)
+        gained = generate_freezes(streak.difficulty)
+        streak.freezes += gained
+        earned_freezes = gained
 
     db.session.commit()
-    return jsonify(streak.to_dict())
+
+    return jsonify({
+        **streak.to_dict(),
+        "used_freezes": used_freezes,
+        "earned_freezes": earned_freezes
+    })
 
 
 @app.route("/streak/reset", methods=["POST"])

@@ -13,7 +13,7 @@ function StreakPage() {
     setMessage({ text, type });
     setTimeout(() => {
       setMessage(null);
-    }, 3000);
+    }, 5000);
   };
 
   useEffect(() => {
@@ -40,8 +40,6 @@ function StreakPage() {
 
   const addStreak = async () => {
     try {
-      const prevFreezes = streakData?.freezes ?? 0;
-
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/streak/add`,
         null,
@@ -51,13 +49,35 @@ function StreakPage() {
       const newData = response.data;
       setStreakData(newData);
 
-      if (newData.freezes < prevFreezes) {
-        const used = prevFreezes - newData.freezes;
+      const { used_freezes, earned_freezes, current_streak } = newData;
+
+      if (current_streak === 0) {
+        showMessage("Your streak has been reset!", "error");
+        return;
+      }
+
+      if (used_freezes > 0 && earned_freezes > 0) {
         showMessage(
-          `You missed some days, ${used} freeze${used > 1 ? "s" : ""} ${
-            used > 1 ? "were" : "was"
-          } used!`,
+          `You missed some days and used ${used_freezes} freeze${
+            used_freezes > 1 ? "s" : ""
+          }, but earned ${earned_freezes} new one${
+            earned_freezes > 1 ? "s" : ""
+          }`,
           "warning"
+        );
+      } else if (used_freezes > 0) {
+        showMessage(
+          `You missed some days, ${used_freezes} freeze${
+            used_freezes > 1 ? "s" : ""
+          } ${used_freezes > 1 ? "were" : "was"} used!`,
+          "warning"
+        );
+      } else if (earned_freezes > 0) {
+        showMessage(
+          `Great job! You earned ${earned_freezes} extra freeze${
+            earned_freezes > 1 ? "s" : ""
+          }`,
+          "success"
         );
       } else {
         showMessage("Good job!", "success");
@@ -76,7 +96,7 @@ function StreakPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setStreakData(response.data);
-      showMessage("Streak resetted", "success");
+      showMessage("Streak resetted", "warning");
     } catch (err) {
       console.error("Error resetting streak:", err);
       showMessage("Could not reset streak");
@@ -95,7 +115,7 @@ function StreakPage() {
         ...prev,
         difficulty: response.data.difficulty,
       }));
-      showMessage("Difficulty changed", "success");
+      showMessage("Difficulty changed", "warning");
     } catch (err) {
       console.error("Error updating difficulty:", err);
       showMessage("Could not update difficulty");
