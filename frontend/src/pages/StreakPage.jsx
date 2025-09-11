@@ -40,13 +40,28 @@ function StreakPage() {
 
   const addStreak = async () => {
     try {
+      const prevFreezes = streakData?.freezes ?? 0;
+
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/streak/add`,
         null,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setStreakData(response.data);
-      showMessage("Good job!", "success");
+
+      const newData = response.data;
+      setStreakData(newData);
+
+      if (newData.freezes < prevFreezes) {
+        const used = prevFreezes - newData.freezes;
+        showMessage(
+          `You missed some days, ${used} freeze${used > 1 ? "s" : ""} ${
+            used > 1 ? "were" : "was"
+          } used!`,
+          "warning"
+        );
+      } else {
+        showMessage("Good job!", "success");
+      }
     } catch (err) {
       console.error("Error adding streak:", err);
       showMessage(err.response?.data?.error || "Could not add streak.");
@@ -61,6 +76,7 @@ function StreakPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setStreakData(response.data);
+      showMessage("Streak resetted", "success");
     } catch (err) {
       console.error("Error resetting streak:", err);
       showMessage("Could not reset streak");
@@ -79,6 +95,7 @@ function StreakPage() {
         ...prev,
         difficulty: response.data.difficulty,
       }));
+      showMessage("Difficulty changed", "success");
     } catch (err) {
       console.error("Error updating difficulty:", err);
       showMessage("Could not update difficulty");

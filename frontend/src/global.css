@@ -148,6 +148,11 @@ button:active {
   animation: fadeInOut 3s ease-in-out forwards;
 }
 
+.warning {
+  color: #ff9100;
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+
 .note {
   font-size: 0.9rem;
 }

@@ -59,7 +59,7 @@ The frontend is built with **React** and Vite, providing a responsive and modern
 
 #### Components:
 
-- **components/Footer.jsx**: Reusable footer.
+- **components/Footer.jsx**: Reusable footer with logout function.
 
 #### Config & Metadata Files:
 
