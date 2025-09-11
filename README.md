@@ -1,10 +1,12 @@
 # Streak Saver
 
-#### Video Demo: <URL HERE>
+#### Video Demo:
+
+https://youtu.be/0dxHu99Fssg
 
 #### Description:
 
-Streak Saver is a (web) application designed to help users maintain daily habits and track their progress over time by pressing the green button. The application is built with a Python Flask backend and a React frontend, providing a smooth user experience with JWT-based authentication, streak management, and personalized difficulty settings. Users can register, log in, view their current streak, mark tasks as completed, reset streaks, and adjust difficulty settings.
+Streak Saver is a (web) application designed to help users maintain daily habits and track their progress over time by pressing a big green button. The application is built with a Python Flask backend and a React frontend, providing a smooth user experience with JWT-based authentication, streak management, and personalized difficulty settings. Users can register, log in, view their current streak, mark tasks as completed, reset streaks, and adjust difficulty settings.
 
 This is also my final project for the Harvard CS50's Introduction to Computer Science Course.
 
