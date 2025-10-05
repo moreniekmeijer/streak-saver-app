@@ -21,13 +21,6 @@ db.init_app(app)
 bcrypt.init_app(app)
 
 
-@app.route("/init-db")
-def init_db():
-    with app.app_context():
-        db.create_all()
-    return "Database tables created", 200
-
-
 # User logic
 @app.route("/register", methods=["POST"])
 def register():
