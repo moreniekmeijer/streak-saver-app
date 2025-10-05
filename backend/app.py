@@ -9,7 +9,8 @@ from models import db, bcrypt, User, Streak
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///site.db")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    "DATABASE_URL", "sqlite:///site.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'mysecretkey')
@@ -75,13 +76,13 @@ def login():
 def handle_missed_days(streak):
     if not streak.last_action_date:
         return 0
-    
+
     last = streak.last_action_date
     today = date.today()
     diff = (today - last).days
     if diff <= 1:
         return 0
-    
+
     missed = diff - 1
     used = 0
     if streak.freezes >= missed:
@@ -122,7 +123,7 @@ def add_streak():
     last = streak.last_action_date
     if last == today:
         return jsonify({"error": "Already done today"}), 400
-    
+
     streak.current_streak += 1
     streak.last_action_date = today
 
