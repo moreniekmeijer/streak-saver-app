@@ -21,13 +21,11 @@ db.init_app(app)
 bcrypt.init_app(app)
 
 
-def generate_freezes(difficulty):
-    lookup = {
-        "easy": [1, 2, 3],
-        "medium": [0, 1, 2],
-        "hard": [0, 1]
-    }
-    return random.choice(lookup.get(difficulty, lookup["easy"]))
+@app.route("/init-db")
+def init_db():
+    with app.app_context():
+        db.create_all()
+    return "Database tables created", 200
 
 
 # User logic
@@ -73,6 +71,15 @@ def login():
 
 
 # Streak logic
+def generate_freezes(difficulty):
+    lookup = {
+        "easy": [1, 2, 3],
+        "medium": [0, 1, 2],
+        "hard": [0, 1]
+    }
+    return random.choice(lookup.get(difficulty, lookup["easy"]))
+
+
 def handle_missed_days(streak):
     if not streak.last_action_date:
         return 0
