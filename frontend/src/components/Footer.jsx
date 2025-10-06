@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -30,10 +30,8 @@ const Footer = () => {
       setMessage("Account deleted successfully");
       setTimeout(() => setMessage(""), 3000);
 
-      setTimeout(() => {
-        logout();
-        navigate("/login");
-      }, 1500);
+      logout();
+      navigate("/login");
     } catch (error) {
       console.error(error);
       alert("Something went wrong while deleting your account.");
