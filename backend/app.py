@@ -63,6 +63,24 @@ def login():
     return jsonify({"token": access_token, "user": user.to_dict()}), 200
 
 
+@app.route("/delete-account", methods=["DELETE"])
+@jwt_required()
+def delete_account():
+    user_id = int(get_jwt_identity())
+    user = User.query.filter_by(id=user_id).first()
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    for streak in user.streak:
+        db.session.delete(streak)
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({"message": "Account deleted successfully"}), 200
+
+
 # Streak logic
 def generate_freezes(difficulty):
     lookup = {

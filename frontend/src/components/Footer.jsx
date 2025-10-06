@@ -6,6 +6,7 @@ import axios from "axios";
 const Footer = () => {
   const { logout, token } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [message, setMessage] = useState("");
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -26,9 +27,13 @@ const Footer = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      alert("Account deleted successfully.");
-      logout();
-      navigate("/login");
+      setMessage("Account deleted successfully");
+      setTimeout(() => setMessage(""), 3000);
+
+      setTimeout(() => {
+        logout();
+        navigate("/login");
+      }, 1500);
     } catch (error) {
       console.error(error);
       alert("Something went wrong while deleting your account.");
@@ -43,6 +48,7 @@ const Footer = () => {
           <button onClick={handleDeleteAccount}>Delete Account</button>
         </>
       )}
+      {message && <p>{message}</p>}
     </footer>
   );
 };
